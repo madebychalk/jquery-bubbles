@@ -144,7 +144,7 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
     this.bubbles = [];
     this.current = 0;
     
-    if(animation && $.inArray(downcase(conf.direction), keyframes) < 0) {
+    if(animation && $.inArray(downcase(conf.direction), timelines) < 0) {
         var keyframes = '@' + prefix + 'keyframes bubble' + capitalize(conf.direction) + ' { '+
           'from {' + prefix + 'transform:' + translateString + '( ' + coords(conf.direction, translateString, maxDistance).start + ' ) }'+
           ' to {' + prefix + 'transform:' + translateString + '( ' + coords(conf.direction, translateString, maxDistance).end + ' ) }'+
