@@ -46,7 +46,7 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
 
 
   downcase =   function(str) { return str.toLowerCase(); };
-  capitalize = function(str) { return str.charAt(0).toUpperCse() + str.slice(1); };
+  capitalize = function(str) { return str.charAt(0).toUpperCase() + str.slice(1); };
 
   if(!animation) {
     $.each(vendors, function(index, vendor){
