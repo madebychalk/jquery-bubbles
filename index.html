@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bubbles!</title>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/jquery.bubbles.js" type="text/javascript" charset="utf-8"></script>
+
+  <link rel="stylesheet" href="css/all.css">
+
+  <style type="text/css">
+    .bubble {
+      height: 7px;
+      width: 7px;
+      background: url('img/bubble.png');
+      overflow: hidden;
+      position: absolute;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Catch the bubbles Chester</h1>
+
+  <div id="up_bubbles" class="bubbles">
+    Bubbles Go Up
+  </div>
+
+  <div id="down_bubbles" class="bubbles">
+    Bubbles Go Down
+  </div>
+
+  <div id="left_bubbles" class="bubbles">
+        <figcaption>Bubbles Go Left</figcaption>
+  </div>
+
+  <div id="right_bubbles" class="bubbles">
+        <figcaption>Bubbles Go Right</figcaption>
+  </div>
+
+<script>
+  $('#down_bubbles').bubbles(); // bubbles go down by default;
+  $('#up_bubbles').bubbles({direction: 'up'});
+  $('#left_bubbles').bubbles({direction: 'left'});
+  $('#right_bubbles').bubbles({direction: 'right'});
+
+  // All Options:
+  // $('#my_id').bubbles({
+  //    className:    'bubble', // class name on each button (for styling);
+  //    maxBubbles:   20,
+  //    minDuration:  3000,
+  //    maxDuration:  7000,
+  //    maxDelay:     8000,
+  //    direction:    'down'
+  //  });
+ 
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+body {
+  font: normal normal normal 1em/1.5em Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+}
+
+.bubbles {
+  background: #fec759;
+  border: 1px solid #000;
+  color: #fff;
+  font-weight: bold;
+  margin: 20px;
+  padding: 300px 0 20px 0;
+  text-align: center;
+}
+
