@@ -53,7 +53,7 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
       
       if (testEl.get(0).style[vendor + 'AnimationName'] !== undefined) {
         prefix = '-' + downcase(vendor) + '-';
-        animationString = prefix + capitalize(animationString);
+        animationString = prefix + animationString;
         animation = true;
         
         if(testEl.get(0).style[vendor + 'Perspective'] !== undefined) {
@@ -134,62 +134,66 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
   };
 
   Bubbles = function(el, conf) {
-    var $el = $(el);
-    
-    if($el.css('position') === 'static') {
-      $el.css({position: 'relative'});
+    this.$el      = $(el);
+    this.conf     = conf;
+    this.bubbles  = [];
+    this.current  = 0;
+
+    var maxDistance = ($.inArray(downcase(this.conf.direction), 'down up'.split(' ')) < 0) ? this.$el.innerWidth() : this.$el.innerHeight();
+
+    if(this.$el.css('position') === 'static') {
+      this.$el.css({position: 'relative'});
     }
     
-    var maxDistance = ($.inArray(downcase(conf.direction), 'down up'.split(' ')) < 0) ? $el.innerWidth() : $el.innerHeight();
-    this.bubbles = [];
-    this.current = 0;
-    
-    if(animation && $.inArray(downcase(conf.direction), timelines) < 0) {
-        var keyframes = '@' + prefix + 'keyframes bubble' + capitalize(conf.direction) + ' { '+
-          'from {' + prefix + 'transform:' + translateString + '( ' + coords(conf.direction, translateString, maxDistance).start + ' ) }'+
-          ' to {' + prefix + 'transform:' + translateString + '( ' + coords(conf.direction, translateString, maxDistance).end + ' ) }'+
-        ' }';
+    if(animation && $.inArray(downcase(this.conf.direction), timelines) < 0) {
+      var keyframes = '@' + prefix + 'keyframes bubble' + capitalize(this.conf.direction) + ' { '+
+        '0% {' + prefix + 'transform:' + translateString + '( ' + coords(this.conf.direction, translateString, maxDistance).start + ' ) }'+
+        ' 100% {' + prefix + 'transform:' + translateString + '( ' + coords(this.conf.direction, translateString, maxDistance).end + ' ) }'+
+      ' }';
 
-        var s = $('<style type="text/css"></style>');
-            s.html(keyframes);
+      var s = $('<style type="text/css"></style>');
+          s.html(keyframes);
 
-        $('head').append(s);
+      $('head').append(s);
 
-        timelines.push(downcase(conf.direction));
-      }
+      timelines.push(downcase(this.conf.direction));
+    }
 
-      for(var i = 0; i <= conf.maxBubbles; i++) {
+    if(this.conf.autoStart) {
+      this.start();
+    }
+  };
+
+  Bubbles.prototype = {
+    start: function() {
+      for(var i = 0; i < this.conf.maxBubbles; i++) {
+        var dur = Math.round(this.conf.minDuration+(Math.random()*(this.conf.maxDuration-this.conf.minDuration)));
+        var del = Math.ceil(Math.random() * this.conf.maxDelay);
         
-        
-        var dur = Math.round(conf.minDuration+(Math.random()*(conf.maxDuration-conf.minDuration)));
-        var del = Math.ceil(Math.random() * conf.maxDelay);
-        
-        var b = testEl.clone().addClass(conf.className).data("active", false).data("duration", dur);
-        b.css(startPos(conf.direction));
+        var b = testEl.clone().addClass(this.conf.className).data("active", false).data("duration", dur);
+        b.css(startPos(this.conf.direction));
         this.bubbles.push(b);
-        $el.append(b);
-        
+        this.$el.append(b);
         
         if(animation) {  
           // .css not working?
-          b.attr('style', b.attr('style') + ' ' + animationString + ': bubble' + capitalize(conf.direction) + ' ' + dur + 'ms ' + del + 'ms ease-in infinite');
+          b.attr('style', b.attr('style') + ' ' + animationString + ': bubble' + capitalize(this.conf.direction) + ' ' + dur + 'ms ' + del + 'ms ease-in infinite');
         }
-        
       }
-    
-    if(!animation) {
-      var me = this;
-       setInterval(function(){
-         if(!me.bubbles[me.current].data("active")) {
+
+      if(!animation) {
+        var me = this;
+        this.interval = setInterval(function(){
+          if(!me.bubbles[me.current].data("active")) {
             var bubble = me.bubbles[me.current];
             var epos = endPos(conf.direction);
 
             bubble.data("active", true)
-             .css(startPos(conf.direction))
-             .show()
-             .animate(epos, bubble.data("duration"), 'easeInSine', function() {
-               bubble.data("active", false).hide();
-             });
+              .css(startPos(conf.direction))
+              .show()
+              .animate(epos, bubble.data("duration"), 'easeInSine', function() {
+                 bubble.data("active", false).hide();
+              });
           }
 
           if(me.current < conf.maxBubbles) {
@@ -197,8 +201,30 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
           } else {
             me.current = 0;
           }
-       },50);
-     }
+
+        },50);
+      }
+    },
+
+    stop: function() {
+      for(var i = 0; i < this.bubbles.length; i++) {
+        this.bubbles[i].remove();
+      }
+
+      if(!animation) {
+        clearInterval(this.interval);
+      }
+
+      this.bubbles = [];
+    },
+
+    toggle: function() {
+      if(this.bubbles.length) {
+        this.stop();
+      } else {
+        this.start();
+      }
+    }
   };
 
   $.fn.bubbles = function(options) {
@@ -210,7 +236,6 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
           $el = $(this);
 
       instance = $el.data('bubbles');
-
       if(instance) {
         instance[args[0]].apply(instance, after);
       } else {
@@ -220,7 +245,8 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
           minDuration:  3000,
           maxDuration:  7000,
           maxDelay:     8000,
-          direction:    'down'
+          direction:    'down',
+          autoStart:    true
         }, options);
 
         $el.data( 'bubbles', new Bubbles($el, options) );
