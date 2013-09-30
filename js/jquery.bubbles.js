@@ -39,6 +39,8 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
       animation = ( testEl.get(0).style.animationName ) ? true : false,
       downcase,
       capitalize,
+      guid,
+      std_dev,
       coords,
       startPos,
       endPos,
@@ -63,6 +65,19 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
       }
     });
   }
+
+  guid = function() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+      return v.toString(16);
+    });
+  };
+
+  std_dev = function(mean, stdev) {
+    var rnd_snd = (Math.random()*2-1)+(Math.random()*2-1)+(Math.random()*2-1);
+    console.log(rnd_snd);
+    return Math.round(rnd_snd*stdev+mean);
+  };
 
   coords = function(dir, trans, max) {
     if(trans === 'translate3d') {
@@ -91,8 +106,8 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
     return false;
   };
   
-  startPos = function(dir) {
-    var startPos = Math.ceil(Math.random() * 99);
+  startPos = function(dir, mean, dev) {
+    var startPos = std_dev(mean, dev);   
     dir = downcase(dir);
     var pos;
     switch (dir) {
@@ -122,6 +137,7 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
         break;
       case 'right':
         pos = {left: '100%'};
+
         break;
       case 'up':
         pos = {bottom: '100%'};
@@ -145,8 +161,8 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
       this.$el.css({position: 'relative'});
     }
     
-    if(animation && $.inArray(downcase(this.conf.direction), timelines) < 0) {
-      var keyframes = '@' + prefix + 'keyframes bubble' + capitalize(this.conf.direction) + ' { '+
+    if(animation && $.inArray(this.conf.uid, timelines) < 0) {
+      var keyframes = '@' + prefix + 'keyframes bubble' + this.conf.uid + ' { '+
         '0% {' + prefix + 'transform:' + translateString + '( ' + coords(this.conf.direction, translateString, maxDistance).start + ' ) }'+
         ' 100% {' + prefix + 'transform:' + translateString + '( ' + coords(this.conf.direction, translateString, maxDistance).end + ' ) }'+
       ' }';
@@ -156,7 +172,7 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
 
       $('head').append(s);
 
-      timelines.push(downcase(this.conf.direction));
+      timelines.push(this.conf.uid);
     }
 
     if(this.conf.autoStart) {
@@ -171,13 +187,19 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
         var del = Math.ceil(Math.random() * this.conf.maxDelay);
         
         var b = testEl.clone().addClass(this.conf.className).data("active", false).data("duration", dur);
-        b.css(startPos(this.conf.direction));
+        b.css(startPos(this.conf.direction, this.conf.mean, this.conf.std_dev));
         this.bubbles.push(b);
         this.$el.append(b);
         
         if(animation) {  
           // .css not working?
-          b.attr('style', b.attr('style') + ' ' + animationString + ': bubble' + capitalize(this.conf.direction) + ' ' + dur + 'ms ' + del + 'ms ease-in infinite');
+          b.hide();
+          b.attr('style', b.attr('style') + ' ' + animationString + ': bubble' + this.conf.uid + ' ' + dur + 'ms ' + del + 'ms ease-in infinite');
+
+          (function() {
+            var c = b;
+            setTimeout(function(){ c.show(); }, del * 2);
+          })();
         }
       }
 
@@ -229,7 +251,8 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
 
   $.fn.bubbles = function(options) {
     var args  = $.makeArray(arguments),
-        after = args.slice(1);
+        after = args.slice(1),
+        uid   = guid();
 
     return this.each(function() {
       var instance,
@@ -246,7 +269,10 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
           maxDuration:  7000,
           maxDelay:     8000,
           direction:    'down',
-          autoStart:    true
+          autoStart:    true,
+          uid:          uid,
+          mean:         50,
+          std_dev:      15
         }, options);
 
         $el.data( 'bubbles', new Bubbles($el, options) );
@@ -256,3 +282,4 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
   };
 
 });
+
