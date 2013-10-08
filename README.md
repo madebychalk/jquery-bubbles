@@ -1,4 +1,4 @@
 jquery-bubbles
 ==============
 
-Catch the bubbles Chester!
+Creates a bubble effect like the one seen on fargobrewing.com

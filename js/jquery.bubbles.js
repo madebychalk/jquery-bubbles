@@ -75,7 +75,6 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
 
   std_dev = function(mean, stdev) {
     var rnd_snd = (Math.random()*2-1)+(Math.random()*2-1)+(Math.random()*2-1);
-    console.log(rnd_snd);
     return Math.round(rnd_snd*stdev+mean);
   };
 
@@ -205,26 +204,26 @@ http://www.youtube.com/watch?v=IiTjrpfssY0
 
       if(!animation) {
         var me = this;
+        
         this.interval = setInterval(function(){
           if(!me.bubbles[me.current].data("active")) {
             var bubble = me.bubbles[me.current];
-            var epos = endPos(conf.direction);
+            var epos = endPos(me.conf.direction);
 
             bubble.data("active", true)
-              .css(startPos(conf.direction))
+              .css(startPos(me.conf.direction))
               .show()
               .animate(epos, bubble.data("duration"), 'easeInSine', function() {
                  bubble.data("active", false).hide();
               });
           }
 
-          if(me.current < conf.maxBubbles) {
+          if(me.current < me.conf.maxBubbles - 1) {
             me.current++;
           } else {
             me.current = 0;
           }
-
-        },50);
+        }, 50);
       }
     },
 
